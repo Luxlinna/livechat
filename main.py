@@ -100,6 +100,11 @@ def serve_widget():
         headers={"Cache-Control": "public, max-age=3600"},
     )
 
+@app.get("/demo")
+def serve_demo():
+    """Serve the widget demo/integration guide page."""
+    return FileResponse("livechat_widget.html", media_type="text/html")
+
 
 @app.post("/ai-chat")
 async def ai_chat(req: AiChatRequest):

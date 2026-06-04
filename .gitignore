@@ -5,6 +5,7 @@ __pycache__/
 .env
 .venv/
 venv/
+*.pyc
 
 # Data (keep local, not in repo)
 conversations.json
