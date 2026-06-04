@@ -296,12 +296,12 @@ document.getElementById('my-btn').addEventListener('click', () => {
 -->
 <script>
   window.LiveChat = {
-    apiBase:      'https://livechat-5u7e.onrender.com',
+    apiBase:      window.location.origin,   // auto: localhost in dev, Render in prod
     brandName:    'Merlkon Khmer Support',
     primaryColor: '#1e8a44',
   };
 </script>
-<script src="https://livechat-5u7e.onrender.com/widget.js" async></script>
+<script src="/widget.js" async></script>
 
 </body>
 </html>

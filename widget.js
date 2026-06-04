@@ -592,7 +592,6 @@
 
     addMsg('user', msg);
     saveMessage('user', msg);
-    chatHistory.push({ role: 'user', content: msg });
     setQuickReplies([]);
     showTyping();
 
@@ -603,7 +602,7 @@
         body: JSON.stringify({
           message: msg,
           session_id: sid,
-          history: chatHistory.slice(-10)
+          history: chatHistory.slice(-10)   // previous turns only, not current msg
         })
       });
       removeTyping();
@@ -611,16 +610,16 @@
         const data = await res.json();
         addMsg('bot', data.reply);
         saveMessage('bot', data.reply);
+        // push both turns AFTER successful response so history stays clean
+        chatHistory.push({ role: 'user', content: msg });
         chatHistory.push({ role: 'assistant', content: data.reply });
       } else {
-        throw new Error('ai_unavailable');
+        const err = await res.json().catch(() => ({}));
+        addMsg('bot', `&#x26A0;&#xFE0F; ${err.detail || 'AI unavailable. Please try again.'}`);
       }
     } catch (_) {
       removeTyping();
-      const reply = getReply(msg);
-      addMsg('bot', reply.text);
-      saveMessage('bot', reply.text.replace(/<[^>]+>/g, '').replace(/&#x[\dA-Fa-f]+;|&\w+;/g, ' '));
-      if (reply.quick.length) setQuickReplies(reply.quick);
+      addMsg('bot', '&#x26A0;&#xFE0F; Could not reach AI. Check your connection and try again.');
     }
 
     if (w.ReactNativeWebView) {
