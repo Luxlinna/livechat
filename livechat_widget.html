@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>BallangkMall Chat Widget – Integration Guide</title>
+<title>Live Chat Widget – Integration Guide</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -69,7 +69,7 @@
 
 <div class="hero">
   <div class="hero-icon">💬</div>
-  <h1>BallangkMall Chat Widget</h1>
+  <h1>Live Chat Widget</h1>
 </div>
 <p class="sub">Drop-in plugin — one script tag. Web + mobile ready.</p>
 
@@ -120,7 +120,7 @@ openpyxl</pre>
     <div class="step-num">C</div>
     <div class="step-body">
       <div class="step-title">Note your server URL</div>
-      <div class="step-desc">Render gives you something like <code>https://ballangkmall-chat.onrender.com</code></div>
+      <div class="step-desc">Render gives you something like <code>https://livechat-chat.onrender.com</code></div>
     </div>
   </div>
 </div>
@@ -143,9 +143,9 @@ openpyxl</pre>
       <div class="step-desc">Paste this snippet just before <code>&lt;/body&gt;</code> in your main HTML file
         (<code>index.html</code>, <code>_document.js</code>, or <code>app/layout.tsx</code>):
       </div>
-      <pre>&lt;!-- BallangkMall Chat Widget --&gt;
+      <pre>&lt;!-- Live Chat Widget --&gt;
 &lt;script&gt;
-  window.BallangkMallChat = {
+  window.LiveChat = {
     apiBase:      'https://livechat-5u7e.onrender.com',  // ← paste your Render URL
     botName:      'Bally',
     brandName:    'Merlkon Khmer Support',
@@ -206,7 +206,7 @@ const CHAT_HTML = `
 &lt;head&gt;&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;&lt;/head&gt;
 &lt;body style="margin:0"&gt;
   &lt;script&gt;
-    window.BallangkMallChat = {
+    window.LiveChat = {
       apiBase:   'https://livechat-5u7e.onrender.com',
       mode:      'inline',
       brandName: 'Merlkon Khmer Support',
@@ -248,7 +248,7 @@ class ChatScreen extends StatelessWidget {
 &lt;head&gt;&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;&lt;/head&gt;
 &lt;body style="margin:0"&gt;
   &lt;script&gt;
-    window.BallangkMallChat = {
+    window.LiveChat = {
       apiBase:   'https://livechat-5u7e.onrender.com',
       mode:      'inline',
       brandName: 'Merlkon Khmer Support',
@@ -275,14 +275,14 @@ class ChatScreen extends StatelessWidget {
 <div class="card">
   <h2>🔧 Public JavaScript API</h2>
   <pre>// Call from anywhere on your page after widget.js loads:
-BallangkMallChat.open();              // open chat panel
-BallangkMallChat.close();             // close chat panel
-BallangkMallChat.toggle();            // toggle
-BallangkMallChat.send('Hello!');      // send a message programmatically
+LiveChat.open();              // open chat panel
+LiveChat.close();             // close chat panel
+LiveChat.toggle();            // toggle
+LiveChat.send('Hello!');      // send a message programmatically
 
 // Example — open chat when clicking your own button:
 document.getElementById('my-btn').addEventListener('click', () => {
-  BallangkMallChat.open();
+  LiveChat.open();
 });</pre>
 </div>
 
@@ -291,11 +291,11 @@ document.getElementById('my-btn').addEventListener('click', () => {
 ════════════════════════════════════════ -->
 <!--
   Live demo: run `uvicorn main:app --reload` then open this file
-  at http://localhost:8000/ballangkmall_chat_widget.html
+  at http://localhost:8000/livechat_chat_widget.html
   (FastAPI serves this file only when you serve it from the backend)
 -->
 <script>
-  window.BallangkMallChat = {
+  window.LiveChat = {
     apiBase:      'https://livechat-5u7e.onrender.com',
     brandName:    'Merlkon Khmer Support',
     primaryColor: '#1e8a44',

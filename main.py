@@ -1,5 +1,5 @@
 """
-BallangkMall Chat Backend
+Live Chat Backend
 ─────────────────────────
 Run:  uvicorn main:app --reload
 
@@ -31,7 +31,7 @@ except ImportError:
     EXCEL_OK = False
 
 # ─── App ─────────────────────────────────────────────────────────────────────
-app = FastAPI(title="BallangkMall Chat API", version="1.0.0")
+app = FastAPI(title="Live Chat API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -64,7 +64,7 @@ class ChatMessage(BaseModel):
 
 @app.get("/")
 def root():
-    return {"status": "ok", "service": "BallangkMall Chat API"}
+    return {"status": "ok", "service": "Live Chat API"}
 
 
 @app.get("/widget.js")
@@ -211,7 +211,7 @@ def export_excel():
     wb.save(buf)
     buf.seek(0)
 
-    filename = f"ballangkmall_chats_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    filename = f"livechat_chats_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
     return StreamingResponse(
         buf,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
