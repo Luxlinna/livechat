@@ -22,7 +22,9 @@
  *   messenger     – full m.me URL
  *   whatsappNum   – display label
  *   telegramNum   – display label
- *   fbHandle      – display label
+ *   fbHandle          – display label
+ *   vapiKey           – Vapi public key (enables Voice AI tab)
+ *   vapiAssistantId   – Vapi assistant ID to call
  */
 (function (w, d) {
   'use strict';
@@ -45,6 +47,8 @@
   const WA_N   = cfg.whatsappNum   || '+46 73 776 5168';
   const TG_N   = cfg.telegramNum   || '+46 73 776 5168';
   const FB_L   = cfg.fbHandle      || 'facebook.com/luxlinnaY';
+  const VAPI_KEY = cfg.vapiKey          || '';
+  const VAPI_AID = cfg.vapiAssistantId  || '';
 
   // ── Session ID ───────────────────────────────────────────────────────────────
   let sid = '';
@@ -258,6 +262,70 @@
 
     #lv-toast { position: fixed; bottom: 100px; right: 20px; z-index: 10000; background: #333; color: #fff; font-size: 12px; padding: 6px 14px; border-radius: 20px; opacity: 0; transition: opacity .3s; pointer-events: none; }
     #lv-toast.show { opacity: 1; }
+
+    /* ── Vapi Voice AI pane ── */
+    .lv-voice-pane {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(160deg, #f0fdf4 0%, #e8f5ff 100%);
+      padding: 24px 20px; gap: 20px;
+    }
+    .lv-voice-orb {
+      width: 110px; height: 110px; border-radius: 50%;
+      background: linear-gradient(135deg, ${COLOR}, ${COLORD});
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(30,138,68,.35);
+      cursor: pointer; transition: transform .2s, box-shadow .2s;
+      position: relative;
+    }
+    .lv-voice-orb:hover { transform: scale(1.06); box-shadow: 0 12px 40px rgba(30,138,68,.45); }
+    .lv-voice-orb svg { width: 44px; height: 44px; fill: #fff; }
+    .lv-voice-orb.active { background: linear-gradient(135deg, #e53935, #b71c1c); box-shadow: 0 8px 32px rgba(229,57,53,.4); }
+    .lv-voice-orb.active:hover { box-shadow: 0 12px 40px rgba(229,57,53,.5); }
+    .lv-voice-orb.connecting { animation: lvOrbPulse 1.4s ease-in-out infinite; }
+    @keyframes lvOrbPulse {
+      0%, 100% { box-shadow: 0 8px 32px rgba(30,138,68,.35); }
+      50%       { box-shadow: 0 8px 48px rgba(30,138,68,.7), 0 0 0 16px rgba(30,138,68,.12); }
+    }
+    .lv-voice-orb.active { animation: lvOrbActive 1.2s ease-in-out infinite; }
+    @keyframes lvOrbActive {
+      0%, 100% { box-shadow: 0 8px 32px rgba(229,57,53,.4); }
+      50%       { box-shadow: 0 8px 48px rgba(229,57,53,.7), 0 0 0 14px rgba(229,57,53,.12); }
+    }
+    .lv-voice-status {
+      font-size: 15px; font-weight: 700; color: #1a1a1a; text-align: center;
+    }
+    .lv-voice-sub {
+      font-size: 12px; color: #666; text-align: center; line-height: 1.5; margin-top: -12px;
+    }
+    .lv-voice-bars {
+      display: flex; align-items: center; gap: 4px; height: 32px;
+      opacity: 0; transition: opacity .3s;
+    }
+    .lv-voice-bars.speaking { opacity: 1; }
+    .lv-voice-bar {
+      width: 4px; border-radius: 2px; background: ${COLOR};
+      animation: lvBarWave 1s ease-in-out infinite;
+    }
+    .lv-voice-bar:nth-child(1) { height: 14px; animation-delay: 0s; }
+    .lv-voice-bar:nth-child(2) { height: 24px; animation-delay: .1s; }
+    .lv-voice-bar:nth-child(3) { height: 32px; animation-delay: .2s; }
+    .lv-voice-bar:nth-child(4) { height: 20px; animation-delay: .3s; }
+    .lv-voice-bar:nth-child(5) { height: 14px; animation-delay: .4s; }
+    @keyframes lvBarWave {
+      0%, 100% { transform: scaleY(1); }
+      50%       { transform: scaleY(.4); }
+    }
+    .lv-voice-hint {
+      font-size: 11px; color: #999; text-align: center; line-height: 1.6;
+    }
+    .lv-voice-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: #fff; border-radius: 20px; padding: 5px 12px;
+      font-size: 11px; font-weight: 600; color: #555;
+      box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+    .lv-voice-badge svg { width: 14px; height: 14px; }
   `;
   d.head.appendChild(styleEl);
 
@@ -283,6 +351,7 @@
           </div>
           <div class="lv-tabs">
             <button class="lv-tab active" data-tab="ai">&#x1F916; AI Chat</button>
+            ${VAPI_KEY ? '<button class="lv-tab" data-tab="voice">&#x1F399; Voice AI</button>' : ''}
             <button class="lv-tab" data-tab="connect">&#x1F4AC; Live Agent</button>
           </div>
         </div>
@@ -365,6 +434,31 @@
           </div>
         </div>
       </div>
+
+      ${VAPI_KEY ? `
+      <div class="lv-pane" id="lv-pane-voice">
+        <div class="lv-voice-pane">
+          <div class="lv-voice-bars" id="lv-voice-bars">
+            <div class="lv-voice-bar"></div>
+            <div class="lv-voice-bar"></div>
+            <div class="lv-voice-bar"></div>
+            <div class="lv-voice-bar"></div>
+            <div class="lv-voice-bar"></div>
+          </div>
+          <div class="lv-voice-orb" id="lv-voice-orb">
+            <svg id="lv-mic-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3zm-1 17.93A8 8 0 0 1 4.07 12H2a10 10 0 0 0 9 9.93V23h2v-1.07A10 10 0 0 0 22 12h-2.07A8 8 0 0 1 13 18.93V18h-2v.93z"/></svg>
+            <svg id="lv-end-icon" style="display:none" viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+          </div>
+          <div class="lv-voice-status" id="lv-voice-status">Tap to call AI Agent</div>
+          <div class="lv-voice-sub" id="lv-voice-sub">Speak naturally — the AI will answer</div>
+          <div class="lv-voice-hint">Make sure your microphone is allowed in the browser</div>
+          <div class="lv-voice-badge">
+            <svg viewBox="0 0 24 24" fill="#1a1a1a"><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/></svg>
+            Powered by Vapi AI
+          </div>
+        </div>
+      </div>` : ''}
+
     </div>
     <div id="lv-toast"></div>
   `;
@@ -531,6 +625,83 @@
     isOpen = true;
   } else if (AOPEN) {
     setTimeout(toggle, 600);
+  }
+
+  // ── Vapi Voice AI ─────────────────────────────────────────────────────────────
+  if (VAPI_KEY) {
+    let vapiInst    = null;
+    let callActive  = false;
+
+    const orbEl     = d.getElementById('lv-voice-orb');
+    const statusEl  = d.getElementById('lv-voice-status');
+    const subEl     = d.getElementById('lv-voice-sub');
+    const barsEl    = d.getElementById('lv-voice-bars');
+    const micIcon   = d.getElementById('lv-mic-icon');
+    const endIcon   = d.getElementById('lv-end-icon');
+
+    function setVoiceUI(state) {
+      orbEl.className  = 'lv-voice-orb';
+      barsEl.className = 'lv-voice-bars';
+      micIcon.style.display = 'block';
+      endIcon.style.display = 'none';
+
+      if (state === 'idle') {
+        statusEl.textContent = 'Tap to call AI Agent';
+        subEl.textContent    = 'Speak naturally — the AI will answer';
+      } else if (state === 'connecting') {
+        orbEl.classList.add('connecting');
+        statusEl.textContent = 'Connecting…';
+        subEl.textContent    = 'Please wait';
+      } else if (state === 'active') {
+        orbEl.classList.add('active');
+        micIcon.style.display = 'none';
+        endIcon.style.display = 'block';
+        statusEl.textContent  = 'Call active — tap to end';
+        subEl.textContent     = 'AI Agent is listening';
+      } else if (state === 'speaking') {
+        orbEl.classList.add('active');
+        barsEl.classList.add('speaking');
+        micIcon.style.display = 'none';
+        endIcon.style.display = 'block';
+        statusEl.textContent  = 'AI Agent is speaking…';
+        subEl.textContent     = 'Tap orb to end call';
+      } else if (state === 'error') {
+        statusEl.textContent = 'Connection failed';
+        subEl.textContent    = 'Check mic permissions and try again';
+      }
+    }
+
+    function loadVapiSDK(cb) {
+      if (w.Vapi) { cb(); return; }
+      const s  = d.createElement('script');
+      s.src    = 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.umd.js';
+      s.onload = cb;
+      s.onerror = () => setVoiceUI('error');
+      d.head.appendChild(s);
+    }
+
+    function initVapi() {
+      loadVapiSDK(() => {
+        vapiInst = new w.Vapi(VAPI_KEY);
+
+        vapiInst.on('call-start',   () => { callActive = true;  setVoiceUI('active'); });
+        vapiInst.on('call-end',     () => { callActive = false; setVoiceUI('idle'); });
+        vapiInst.on('speech-start', () => setVoiceUI('speaking'));
+        vapiInst.on('speech-end',   () => setVoiceUI('active'));
+        vapiInst.on('error',        () => { callActive = false; setVoiceUI('error'); });
+
+        orbEl.addEventListener('click', () => {
+          if (!callActive) {
+            setVoiceUI('connecting');
+            vapiInst.start(VAPI_AID);
+          } else {
+            vapiInst.stop();
+          }
+        });
+      });
+    }
+
+    initVapi();
   }
 
   // ── Public API ────────────────────────────────────────────────────────────────
