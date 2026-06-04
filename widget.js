@@ -32,7 +32,7 @@
 
   // ── Config ──────────────────────────────────────────────────────────────────
   const cfg    = w.BallangkMallChat || {};
-  const API    = cfg.apiBase       || 'https://YOUR_SERVER_URL';
+  const API    = cfg.apiBase       || 'https://livechat-5u7e.onrender.com';
   const COLOR  = cfg.primaryColor  || '#1e8a44';
   const COLORD = cfg.darkColor     || '#16703a';
   const BOT    = cfg.botName       || 'Bally';

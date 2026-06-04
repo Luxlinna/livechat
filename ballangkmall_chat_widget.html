@@ -146,7 +146,7 @@ openpyxl</pre>
       <pre>&lt;!-- BallangkMall Chat Widget --&gt;
 &lt;script&gt;
   window.BallangkMallChat = {
-    apiBase:      'https://YOUR_RENDER_URL',  // ← paste your Render URL
+    apiBase:      'https://livechat-5u7e.onrender.com',  // ← paste your Render URL
     botName:      'Bally',
     brandName:    'Merlkon Khmer Support',
     primaryColor: '#1e8a44',
@@ -155,7 +155,7 @@ openpyxl</pre>
     messenger:    'https://m.me/luxlinnaY',
   };
 &lt;/script&gt;
-&lt;script src="https://YOUR_RENDER_URL/widget.js" async&gt;&lt;/script&gt;</pre>
+&lt;script src="https://livechat-5u7e.onrender.com/widget.js" async&gt;&lt;/script&gt;</pre>
     </div>
   </div>
 
@@ -172,7 +172,7 @@ openpyxl</pre>
       <pre>[[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self' https://YOUR_RENDER_URL; script-src 'self' 'unsafe-inline' https://YOUR_RENDER_URL"
+    Content-Security-Policy = "default-src 'self' https://livechat-5u7e.onrender.com; script-src 'self' 'unsafe-inline' https://livechat-5u7e.onrender.com"
 
 # Netlify snippet injection — adds the widget to every page automatically
 [[plugins]]
@@ -198,7 +198,7 @@ openpyxl</pre>
       <pre>import { WebView } from 'react-native-webview';
 import { Linking } from 'react-native';
 
-const CHAT_URL = 'https://YOUR_RENDER_URL/widget.html';
+const CHAT_URL = 'https://livechat-5u7e.onrender.com/widget.html';
 
 // OR load inline:
 const CHAT_HTML = `
@@ -207,12 +207,12 @@ const CHAT_HTML = `
 &lt;body style="margin:0"&gt;
   &lt;script&gt;
     window.BallangkMallChat = {
-      apiBase:   'https://YOUR_RENDER_URL',
+      apiBase:   'https://livechat-5u7e.onrender.com',
       mode:      'inline',
       brandName: 'Merlkon Khmer Support',
     };
   &lt;/script&gt;
-  &lt;script src="https://YOUR_RENDER_URL/widget.js"&gt;&lt;/script&gt;
+  &lt;script src="https://livechat-5u7e.onrender.com/widget.js"&gt;&lt;/script&gt;
 &lt;/body&gt;&lt;/html&gt;`;
 
 export default function ChatScreen() {
@@ -249,12 +249,12 @@ class ChatScreen extends StatelessWidget {
 &lt;body style="margin:0"&gt;
   &lt;script&gt;
     window.BallangkMallChat = {
-      apiBase:   'https://YOUR_RENDER_URL',
+      apiBase:   'https://livechat-5u7e.onrender.com',
       mode:      'inline',
       brandName: 'Merlkon Khmer Support',
     };
   &lt;/script&gt;
-  &lt;script src="https://YOUR_RENDER_URL/widget.js"&gt;&lt;/script&gt;
+  &lt;script src="https://livechat-5u7e.onrender.com/widget.js"&gt;&lt;/script&gt;
 &lt;/body&gt;&lt;/html&gt;''';
 
   @override
@@ -296,12 +296,12 @@ document.getElementById('my-btn').addEventListener('click', () => {
 -->
 <script>
   window.BallangkMallChat = {
-    apiBase:      'http://localhost:8000',
+    apiBase:      'https://livechat-5u7e.onrender.com',
     brandName:    'Merlkon Khmer Support',
     primaryColor: '#1e8a44',
   };
 </script>
-<script src="http://localhost:8000/widget.js" async></script>
+<script src="https://livechat-5u7e.onrender.com/widget.js" async></script>
 
 </body>
 </html>
