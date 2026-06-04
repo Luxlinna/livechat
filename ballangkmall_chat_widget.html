@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BallangkMall Chat Widget – Integration Guide</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 24px 80px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f7fa; color: #1a1a1a; max-width: 740px; margin-inline: auto;
+  }
+  .hero { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .hero-icon { font-size: 32px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { font-size: 13.5px; color: #555; margin-bottom: 32px; }
+  .site-pill {
+    display: inline-block; background: #d2f5e3; color: #0a6632;
+    font-size: 12px; font-weight: 700; padding: 3px 12px;
+    border-radius: 20px; margin-bottom: 28px; text-decoration: none;
+  }
+  .card {
+    background: #fff; border-radius: 14px;
+    padding: 22px 24px; margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  }
+  h2 {
+    font-size: 12px; font-weight: 800; margin: 0 0 14px;
+    color: #1e8a44; text-transform: uppercase; letter-spacing: .8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step {
+    display: flex; gap: 14px; margin-bottom: 18px; align-items: flex-start;
+  }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%; background: #1e8a44;
+    color: #fff; font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .step-desc  { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 10px; }
+  pre {
+    background: #1a1a2e; color: #e2e8f0;
+    border-radius: 10px; padding: 16px;
+    font-size: 12.5px; line-height: 1.7;
+    overflow-x: auto; white-space: pre; margin: 0;
+  }
+  code { background: #eef; color: #333; padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .tag-netlify { background: #00c7b7; color: #fff; }
+  .tag-rn      { background: #e8eeff; color: #003d99; }
+  .tag-flutter { background: #fff3cd; color: #856404; }
+  .tag-api     { background: #fde8e8; color: #991b1b; }
+  .highlight { border-left: 4px solid #1e8a44; background: #f0fdf4; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 13px; line-height: 1.6; margin-top: 10px; }
+  .platform-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .platform-btn {
+    flex: 1; min-width: 140px; padding: 12px 16px; border-radius: 10px;
+    border: 1.5px solid #e0e0e0; background: #fff;
+    font-size: 13px; font-weight: 600; cursor: default;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .divider { height: 1px; background: #f0f0f0; margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-icon">💬</div>
+  <h1>BallangkMall Chat Widget</h1>
+</div>
+<p class="sub">Drop-in plugin — one script tag. Web + mobile ready.</p>
+
+<a class="site-pill" href="https://merlkon-khmer.netlify.app" target="_blank">
+  🌐 merlkon-khmer.netlify.app
+</a>
+
+<!-- ══════════════════════════════════════
+     STEP 1 — Deploy the backend
+════════════════════════════════════════ -->
+<div class="card">
+  <h2>⚙️ Step 1 — Deploy your FastAPI backend <span class="tag tag-api">Required first</span></h2>
+
+  <p class="step-desc" style="margin:0 0 14px; font-size:13px; color:#555;">
+    The widget saves chat logs to your <code>main.py</code> FastAPI server and also serves <code>widget.js</code>.
+    Deploy it to any free hosting service — Render is the easiest.
+  </p>
+
+  <div class="platform-row">
+    <div class="platform-btn">🟣 Render.com — free tier</div>
+    <div class="platform-btn">🚂 Railway.app — free tier</div>
+    <div class="platform-btn">🪰 Fly.io — free tier</div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">A</div>
+    <div class="step-body">
+      <div class="step-title">Add a requirements.txt</div>
+      <pre>fastapi
+uvicorn[standard]
+openpyxl</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">B</div>
+    <div class="step-body">
+      <div class="step-title">Push to GitHub, then connect to Render</div>
+      <div class="step-desc">
+        On Render → New Web Service → connect your repo.<br>
+        Build command: <code>pip install -r requirements.txt</code><br>
+        Start command: <code>uvicorn main:app --host 0.0.0.0 --port $PORT</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">C</div>
+    <div class="step-body">
+      <div class="step-title">Note your server URL</div>
+      <div class="step-desc">Render gives you something like <code>https://ballangkmall-chat.onrender.com</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     STEP 2 — Embed on Netlify site
+════════════════════════════════════════ -->
+<div class="card">
+  <h2>🌐 Step 2 — Add to merlkon-khmer.netlify.app <span class="tag tag-netlify">Netlify</span></h2>
+
+  <p class="step-desc" style="margin:0 0 18px; font-size:13px; color:#555;">
+    Two options — pick whichever matches your setup:
+  </p>
+
+  <!-- Option A: Source code -->
+  <div class="step">
+    <div class="step-num">A</div>
+    <div class="step-body">
+      <div class="step-title">If you have the source code (React / Next.js / HTML)</div>
+      <div class="step-desc">Paste this snippet just before <code>&lt;/body&gt;</code> in your main HTML file
+        (<code>index.html</code>, <code>_document.js</code>, or <code>app/layout.tsx</code>):
+      </div>
+      <pre>&lt;!-- BallangkMall Chat Widget --&gt;
+&lt;script&gt;
+  window.BallangkMallChat = {
+    apiBase:      'https://YOUR_RENDER_URL',  // ← paste your Render URL
+    botName:      'Bally',
+    brandName:    'Merlkon Khmer Support',
+    primaryColor: '#1e8a44',
+    whatsapp:     'https://wa.me/46737765168',
+    telegram:     'https://t.me/+46737765168',
+    messenger:    'https://m.me/luxlinnaY',
+  };
+&lt;/script&gt;
+&lt;script src="https://YOUR_RENDER_URL/widget.js" async&gt;&lt;/script&gt;</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Option B: netlify.toml injection -->
+  <div class="step">
+    <div class="step-num">B</div>
+    <div class="step-body">
+      <div class="step-title">Or use Netlify snippet injection (no code change needed)</div>
+      <div class="step-desc">
+        Add a <code>netlify.toml</code> file to your repo root:
+      </div>
+      <pre>[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self' https://YOUR_RENDER_URL; script-src 'self' 'unsafe-inline' https://YOUR_RENDER_URL"
+
+# Netlify snippet injection — adds the widget to every page automatically
+[[plugins]]
+  package = "@netlify/plugin-inline-functions-env"</pre>
+      <div class="highlight">
+        Or go to: <b>Netlify dashboard → Your site → Site configuration → Build &amp; deploy → Post processing → Snippet injection</b><br>
+        Paste the script tags above into the <b>"Before &lt;/body&gt;"</b> field. No code deploy needed.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     STEP 3 — Mobile WebView
+════════════════════════════════════════ -->
+<div class="card">
+  <h2>📱 Step 3 (optional) — Mobile app <span class="tag tag-rn">React Native</span> <span class="tag tag-flutter">Flutter</span></h2>
+
+  <div class="step">
+    <div class="step-num">A</div>
+    <div class="step-body">
+      <div class="step-title">React Native</div>
+      <pre>import { WebView } from 'react-native-webview';
+import { Linking } from 'react-native';
+
+const CHAT_URL = 'https://YOUR_RENDER_URL/widget.html';
+
+// OR load inline:
+const CHAT_HTML = `
+&lt;!DOCTYPE html&gt;&lt;html&gt;
+&lt;head&gt;&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;&lt;/head&gt;
+&lt;body style="margin:0"&gt;
+  &lt;script&gt;
+    window.BallangkMallChat = {
+      apiBase:   'https://YOUR_RENDER_URL',
+      mode:      'inline',
+      brandName: 'Merlkon Khmer Support',
+    };
+  &lt;/script&gt;
+  &lt;script src="https://YOUR_RENDER_URL/widget.js"&gt;&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;`;
+
+export default function ChatScreen() {
+  const handleMsg = ({ nativeEvent }) => {
+    const data = JSON.parse(nativeEvent.data);
+    if (data.type === 'open_url') Linking.openURL(data.url);
+  };
+  return (
+    &lt;WebView
+      source={{ html: CHAT_HTML }}
+      onMessage={handleMsg}
+      javaScriptEnabled
+      domStorageEnabled
+      style={{ flex: 1 }}
+    /&gt;
+  );
+}</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="step">
+    <div class="step-num">B</div>
+    <div class="step-body">
+      <div class="step-title">Flutter</div>
+      <pre>// pubspec.yaml → webview_flutter: ^4.0.0
+import 'package:webview_flutter/webview_flutter.dart';
+
+class ChatScreen extends StatelessWidget {
+  final _html = '''
+&lt;!DOCTYPE html&gt;&lt;html&gt;
+&lt;head&gt;&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;&lt;/head&gt;
+&lt;body style="margin:0"&gt;
+  &lt;script&gt;
+    window.BallangkMallChat = {
+      apiBase:   'https://YOUR_RENDER_URL',
+      mode:      'inline',
+      brandName: 'Merlkon Khmer Support',
+    };
+  &lt;/script&gt;
+  &lt;script src="https://YOUR_RENDER_URL/widget.js"&gt;&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;''';
+
+  @override
+  Widget build(BuildContext context) {
+    final ctrl = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadHtmlString(_html);
+    return Scaffold(body: WebViewWidget(controller: ctrl));
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PUBLIC JS API
+════════════════════════════════════════ -->
+<div class="card">
+  <h2>🔧 Public JavaScript API</h2>
+  <pre>// Call from anywhere on your page after widget.js loads:
+BallangkMallChat.open();              // open chat panel
+BallangkMallChat.close();             // close chat panel
+BallangkMallChat.toggle();            // toggle
+BallangkMallChat.send('Hello!');      // send a message programmatically
+
+// Example — open chat when clicking your own button:
+document.getElementById('my-btn').addEventListener('click', () => {
+  BallangkMallChat.open();
+});</pre>
+</div>
+
+<!-- ══════════════════════════════════════
+     LIVE DEMO (local dev only)
+════════════════════════════════════════ -->
+<!--
+  Live demo: run `uvicorn main:app --reload` then open this file
+  at http://localhost:8000/ballangkmall_chat_widget.html
+  (FastAPI serves this file only when you serve it from the backend)
+-->
+<script>
+  window.BallangkMallChat = {
+    apiBase:      'http://localhost:8000',
+    brandName:    'Merlkon Khmer Support',
+    primaryColor: '#1e8a44',
+  };
+</script>
+<script src="http://localhost:8000/widget.js" async></script>
+
+</body>
+</html>
