@@ -492,6 +492,9 @@
     return REPLIES.default;
   }
 
+  // ── Conversation history (sent to AI for context) ────────────────────────────
+  const chatHistory = [];
+
   // ── DOM refs ──────────────────────────────────────────────────────────────────
   const panel    = d.getElementById('lvchat-panel');
   const msgList  = d.getElementById('lv-msg-list');
@@ -582,21 +585,44 @@
     } catch (_) { /* silent — never break chat UX */ }
   }
 
-  function send(text) {
+  async function send(text) {
     const msg = (text || (inputEl && inputEl.value) || '').trim();
     if (!msg) return;
     if (inputEl) inputEl.value = '';
+
     addMsg('user', msg);
     saveMessage('user', msg);
+    chatHistory.push({ role: 'user', content: msg });
     setQuickReplies([]);
-    setTimeout(showTyping, 300);
-    setTimeout(() => {
+    showTyping();
+
+    try {
+      const res = await fetch(`${API}/ai-chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msg,
+          session_id: sid,
+          history: chatHistory.slice(-10)
+        })
+      });
+      removeTyping();
+      if (res.ok) {
+        const data = await res.json();
+        addMsg('bot', data.reply);
+        saveMessage('bot', data.reply);
+        chatHistory.push({ role: 'assistant', content: data.reply });
+      } else {
+        throw new Error('ai_unavailable');
+      }
+    } catch (_) {
       removeTyping();
       const reply = getReply(msg);
       addMsg('bot', reply.text);
       saveMessage('bot', reply.text.replace(/<[^>]+>/g, '').replace(/&#x[\dA-Fa-f]+;|&\w+;/g, ' '));
       if (reply.quick.length) setQuickReplies(reply.quick);
-    }, 1200);
+    }
+
     if (w.ReactNativeWebView) {
       w.ReactNativeWebView.postMessage(JSON.stringify({ type: 'message_sent', text: msg }));
     }

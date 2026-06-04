@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, FileResponse
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import json, os, io, re
 from datetime import datetime, timezone
 
@@ -29,6 +29,21 @@ try:
     EXCEL_OK = True
 except ImportError:
     EXCEL_OK = False
+
+# ─── Groq AI ──────────────────────────────────────────────────────────────────
+try:
+    from groq import Groq
+    _groq_key = os.environ.get("GROQ_API_KEY", "")
+    groq_client = Groq(api_key=_groq_key) if _groq_key else None
+except ImportError:
+    groq_client = None
+
+SYSTEM_PROMPT = """You are a helpful, friendly customer support AI assistant.
+- Keep answers concise (2-4 sentences) unless the user needs more detail
+- Be warm, professional, and empathetic
+- Respond in the same language the user writes in
+- If you don't know specific business details (prices, stock, order info), say so honestly and suggest contacting a human agent
+- Never make up information you are not certain about"""
 
 # ─── App ─────────────────────────────────────────────────────────────────────
 app = FastAPI(title="Live Chat API", version="1.0.0")
@@ -60,6 +75,15 @@ class ChatMessage(BaseModel):
     message: str
     page: Optional[str] = None
 
+class HistoryItem(BaseModel):
+    role: str           # "user" or "assistant"
+    content: str
+
+class AiChatRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+    history: Optional[List[HistoryItem]] = None
+
 # ─── Routes ───────────────────────────────────────────────────────────────────
 
 @app.get("/")
@@ -75,6 +99,30 @@ def serve_widget():
         media_type="application/javascript",
         headers={"Cache-Control": "public, max-age=3600"},
     )
+
+
+@app.post("/ai-chat")
+async def ai_chat(req: AiChatRequest):
+    """Call Groq AI and return a reply. Requires GROQ_API_KEY env var."""
+    if not groq_client:
+        raise HTTPException(
+            status_code=503,
+            detail="AI service not configured. Set GROQ_API_KEY environment variable."
+        )
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    if req.history:
+        for h in req.history[-10:]:          # keep last 10 turns for context
+            messages.append({"role": h.role, "content": h.content})
+    messages.append({"role": "user", "content": req.message})
+
+    completion = groq_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=messages,
+        max_tokens=400,
+        temperature=0.7,
+    )
+    reply = completion.choices[0].message.content.strip()
+    return {"reply": reply}
 
 
 @app.post("/chat", status_code=201)
