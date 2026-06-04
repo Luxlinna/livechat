@@ -97,7 +97,7 @@ def serve_widget():
     return FileResponse(
         "widget.js",
         media_type="application/javascript",
-        headers={"Cache-Control": "public, max-age=3600"},
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
     )
 
 @app.get("/demo")
