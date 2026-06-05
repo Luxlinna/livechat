@@ -42,7 +42,7 @@
   const MODE   = cfg.mode          || 'widget';
   const AOPEN  = cfg.autoOpen      !== undefined ? cfg.autoOpen : MODE === 'inline';
   const WA     = cfg.whatsapp      || 'https://wa.me/46737765168';
-  const TG     = cfg.telegram      || 'https://t.me/+46737765168';
+  const TG     = cfg.telegram      || 'https://t.me/@luxlinna';
   const FB     = cfg.messenger     || 'https://m.me/luxlinnaY';
   const WA_N   = cfg.whatsappNum   || '+46 73 776 5168';
   const TG_N   = cfg.telegramNum   || '+46 73 776 5168';

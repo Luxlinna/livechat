@@ -42,7 +42,7 @@ SYSTEM_PROMPT = """You are Bally, a friendly customer support AI assistant for M
 
 LIVE AGENT CHANNELS (always mention these when users need human help or specific account/order info):
 - WhatsApp: +46 73 776 5168
-- Telegram: +46 73 776 5168
+- Telegram: t.me/@luxlinna
 - Messenger: facebook.com/luxlinnaY
 - Tell the user to tap the "💬 Live Agent" tab in this chat widget to connect instantly
 
