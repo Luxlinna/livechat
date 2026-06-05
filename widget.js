@@ -585,6 +585,16 @@
     } catch (_) { /* silent — never break chat UX */ }
   }
 
+  // ── Action tag parser ────────────────────────────────────────────────────────
+  const ACTION_URLS = { telegram: TG, whatsapp: WA, messenger: FB };
+  const ACTION_LABELS = { telegram: 'Telegram', whatsapp: 'WhatsApp', messenger: 'Messenger' };
+
+  function parseAction(reply) {
+    const match = reply.match(/\[ACTION:(\w+)\]/i);
+    if (!match) return { text: reply.trim(), action: null };
+    return { text: reply.replace(/\[ACTION:\w+\]/i, '').trim(), action: match[1].toLowerCase() };
+  }
+
   async function send(text) {
     const msg = (text || (inputEl && inputEl.value) || '').trim();
     if (!msg) return;
@@ -602,17 +612,27 @@
         body: JSON.stringify({
           message: msg,
           session_id: sid,
-          history: chatHistory.slice(-10)   // previous turns only, not current msg
+          history: chatHistory.slice(-10)
         })
       });
       removeTyping();
       if (res.ok) {
         const data = await res.json();
-        addMsg('bot', data.reply);
-        saveMessage('bot', data.reply);
-        // push both turns AFTER successful response so history stays clean
+        const { text: replyText, action } = parseAction(data.reply);
+
+        addMsg('bot', replyText);
+        saveMessage('bot', replyText);
         chatHistory.push({ role: 'user', content: msg });
-        chatHistory.push({ role: 'assistant', content: data.reply });
+        chatHistory.push({ role: 'assistant', content: replyText });
+
+        if (action && ACTION_URLS[action]) {
+          const label = ACTION_LABELS[action] || action;
+          const url   = ACTION_URLS[action];
+          setTimeout(() => {
+            addMsg('bot', `&#x1F4F2; Opening <b>${label}</b> for you now…`);
+            setTimeout(() => openExternal(url), 1000);
+          }, 400);
+        }
       } else {
         const err = await res.json().catch(() => ({}));
         addMsg('bot', `&#x26A0;&#xFE0F; ${err.detail || 'AI unavailable. Please try again.'}`);
